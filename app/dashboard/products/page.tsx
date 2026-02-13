@@ -1,7 +1,14 @@
 import Products from '@/features/products';
 
-export default function ProductsPage() {
-  return <Products />;
+interface ProductsPageProps {
+  searchParams?: {
+    page?: string;
+    limit?: string;
+  };
+}
+
+export default function ProductsPage({ searchParams }: ProductsPageProps) {
+  return <Products searchParams={searchParams} />;
 }
 
 export const metadata = {

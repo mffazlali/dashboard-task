@@ -9,14 +9,25 @@ import type { ProductsResponse } from '@/shared/types';
 
 export const productService = {
   /**
-   * Get all products
+   * Get all products with pagination
    * @endpoint GET /products
    */
-  async getProducts(limit: number = 30): Promise<ProductsResponse> {
+  async getProducts(params?: {
+    limit?: number;
+    skip?: number;
+  }): Promise<ProductsResponse> {
     try {
-      const response = await apiClient.get<ProductsResponse>('products', {
-        limit: limit.toString(),
-      });
+      const queryParams: Record<string, string> = {};
+      
+      if (params?.limit) {
+        queryParams.limit = params.limit.toString();
+      }
+      
+      if (params?.skip) {
+        queryParams.skip = params.skip.toString();
+      }
+
+      const response = await apiClient.get<ProductsResponse>('products', queryParams);
       return response;
     } catch (error) {
       console.error('Error fetching products:', error);

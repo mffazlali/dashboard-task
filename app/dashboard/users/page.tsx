@@ -1,7 +1,14 @@
 import Users from '@/features/users';
 
-export default function UsersPage() {
-  return <Users />;
+interface UsersPageProps {
+  searchParams?: {
+    page?: string;
+    limit?: string;
+  };
+}
+
+export default function UsersPage({ searchParams }: UsersPageProps) {
+  return <Users searchParams={searchParams} />;
 }
 
 export const metadata = {

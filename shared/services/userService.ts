@@ -9,14 +9,25 @@ import type { UsersResponse } from '@/shared/types';
 
 export const userService = {
   /**
-   * Get all users
+   * Get all users with pagination
    * @endpoint GET /users
    */
-  async getUsers(limit: number = 30): Promise<UsersResponse> {
+  async getUsers(params?: {
+    limit?: number;
+    skip?: number;
+  }): Promise<UsersResponse> {
     try {
-      const response = await apiClient.get<UsersResponse>('users', {
-        limit: limit.toString(),
-      });
+      const queryParams: Record<string, string> = {};
+      
+      if (params?.limit) {
+        queryParams.limit = params.limit.toString();
+      }
+      
+      if (params?.skip) {
+        queryParams.skip = params.skip.toString();
+      }
+
+      const response = await apiClient.get<UsersResponse>('users', queryParams);
       return response;
     } catch (error) {
       console.error('Error fetching users:', error);
