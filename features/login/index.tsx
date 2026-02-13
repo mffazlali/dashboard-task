@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Box,
   VStack,
@@ -13,21 +15,29 @@ import {
   Field,
 } from '@chakra-ui/react';
 import { loginAction } from './actions';
+import { loginSchema, type LoginFormData } from './schema';
 
 export default function Login() {
   const router = useRouter();
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+    },
+  });
+
+  const onSubmit = async (data: LoginFormData) => {
     setError('');
-    setLoading(true);
 
     try {
-      const result = await loginAction({ username, password });
+      const result = await loginAction(data);
       
       if (result.success) {
         console.log('Login successful, redirecting...');
@@ -39,8 +49,6 @@ export default function Login() {
     } catch (err) {
       setError('An unexpected error occurred');
       console.error('Login error:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -91,30 +99,32 @@ export default function Login() {
               </Text>
             </Box>
 
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit(onSubmit)}>
               <VStack gap="4">
-                <Field.Root>
+                <Field.Root invalid={!!errors.username}>
                   <Field.Label>Username</Field.Label>
                   <Input
                     type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    {...register('username')}
                     placeholder="Enter your username"
-                    required
                     size="lg"
                   />
+                  {errors.username && (
+                    <Field.ErrorText>{errors.username.message}</Field.ErrorText>
+                  )}
                 </Field.Root>
 
-                <Field.Root>
+                <Field.Root invalid={!!errors.password}>
                   <Field.Label>Password</Field.Label>
                   <Input
                     type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    {...register('password')}
                     placeholder="Enter your password"
-                    required
                     size="lg"
                   />
+                  {errors.password && (
+                    <Field.ErrorText>{errors.password.message}</Field.ErrorText>
+                  )}
                 </Field.Root>
 
                 <Button
@@ -122,7 +132,7 @@ export default function Login() {
                   colorPalette="blue"
                   size="lg"
                   w="full"
-                  loading={loading}
+                  loading={isSubmitting}
                   mt="2"
                 >
                   Sign In

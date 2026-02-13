@@ -9,11 +9,11 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard>
-      <Flex minH="100vh" bg="gray.100">
+      <Flex minH="100vh" maxH="100vh" bg="gray.100" overflow="hidden">
         <Sidebar />
-        <VStack flex="1" gap="0" align="stretch">
+        <VStack flex="1" gap="0" align="stretch" overflow="hidden">
           <Header />
-          <Box as="main" flex="1">
+          <Box as="main" flex="1" overflowY="auto">
             {children}
           </Box>
         </VStack>
