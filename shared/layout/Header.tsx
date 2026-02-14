@@ -23,11 +23,11 @@ export const Header = () => {
         </Text>
         <HStack gap="4">
           <HStack gap="3">
-            <Avatar.Root
-              size="sm"
-              name={`${user.firstName} ${user.lastName}`}
-            >
+            <Avatar.Root size="sm">
               <Avatar.Image src={user.image} />
+              <Avatar.Fallback>
+                {user.firstName[0]}{user.lastName[0]}
+              </Avatar.Fallback>
             </Avatar.Root>
             <VStack align="start" gap="0">
               <Text fontSize="sm" fontWeight="medium">

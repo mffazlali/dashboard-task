@@ -1,14 +1,15 @@
 import Products from '@/features/products';
 
 interface ProductsPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     limit?: string;
-  };
+  }>;
 }
 
-export default function ProductsPage({ searchParams }: ProductsPageProps) {
-  return <Products searchParams={searchParams} />;
+export default async function ProductsPage({ searchParams }: ProductsPageProps) {
+  const params = await searchParams;
+  return <Products searchParams={params} />;
 }
 
 export const metadata = {

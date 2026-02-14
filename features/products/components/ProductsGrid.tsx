@@ -49,7 +49,7 @@ export const ProductsGrid = ({ products }: ProductsGridProps) => {
               <Text
                 fontSize="lg"
                 fontWeight="semibold"
-                noOfLines={2}
+                lineClamp={2}
                 flex="1"
               >
                 {product.title}
@@ -58,7 +58,7 @@ export const ProductsGrid = ({ products }: ProductsGridProps) => {
                 {product.category}
               </Badge>
             </HStack>
-            <Text color="gray.600" fontSize="sm" noOfLines={2} mb="4">
+            <Text color="gray.600" fontSize="sm" lineClamp={2} mb="4">
               {product.description}
             </Text>
             <HStack justify="space-between">

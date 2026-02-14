@@ -4,11 +4,6 @@ import Image from 'next/image';
 import {
   Box,
   Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   HStack,
   VStack,
   Text,

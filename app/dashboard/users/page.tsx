@@ -1,14 +1,15 @@
 import Users from '@/features/users';
 
 interface UsersPageProps {
-  searchParams?: {
+  searchParams?: Promise<{
     page?: string;
     limit?: string;
-  };
+  }>;
 }
 
-export default function UsersPage({ searchParams }: UsersPageProps) {
-  return <Users searchParams={searchParams} />;
+export default async function UsersPage({ searchParams }: UsersPageProps) {
+  const params = await searchParams;
+  return <Users searchParams={params} />;
 }
 
 export const metadata = {
