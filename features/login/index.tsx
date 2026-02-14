@@ -65,7 +65,7 @@ export default function Login() {
         <Card.Body p="8">
           <VStack gap="6" align="stretch">
             <VStack gap="2" textAlign="center">
-              <Heading size="2xl">Welcome Back</Heading>
+              <Heading size="2xl">Welcome</Heading>
               <Text color="gray.600">Sign in to your account</Text>
             </VStack>
 

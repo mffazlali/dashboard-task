@@ -2,18 +2,26 @@
 
 import { SimpleGrid, Box, HStack, VStack, Text } from '@chakra-ui/react';
 
-export const StatsCards = () => {
-  const stats = [
-    { title: 'Total Users', value: '30', icon: '👥' },
-    { title: 'Total Products', value: '30', icon: '📦' },
-    { title: 'Active Sessions', value: '12', icon: '🔥' },
+interface DashboardStats {
+  totalUsers: number;
+  totalProducts: number;
+}
+
+interface StatsCardsProps {
+  stats: DashboardStats;
+}
+
+export const StatsCards = ({ stats }: StatsCardsProps) => {
+  const cards = [
+    { title: 'Total Users', value: stats.totalUsers.toString(), icon: '👥' },
+    { title: 'Total Products', value: stats.totalProducts.toString(), icon: '📦' },
   ];
 
   return (
     <SimpleGrid columns={{ base: 1, md: 3 }} gap="6">
-      {stats.map((stat) => (
+      {cards.map((card) => (
         <Box
-          key={stat.title}
+          key={card.title}
           bg="white"
           borderRadius="lg"
           shadow="md"
@@ -24,13 +32,13 @@ export const StatsCards = () => {
           <HStack justify="space-between">
             <VStack align="start" gap="2">
               <Text color="gray.500" fontSize="sm">
-                {stat.title}
+                {card.title}
               </Text>
               <Text fontSize="3xl" fontWeight="bold">
-                {stat.value}
+                {card.value}
               </Text>
             </VStack>
-            <Text fontSize="4xl">{stat.icon}</Text>
+            <Text fontSize="4xl">{card.icon}</Text>
           </HStack>
         </Box>
       ))}

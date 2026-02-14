@@ -34,7 +34,15 @@ export class ApiClient {
   ): Promise<T> {
     const url = getApiUrl(endpoint);
     
+    console.log('[API Client] Request:', {
+      endpoint,
+      url,
+      method: options.method || 'GET',
+      timestamp: new Date().toISOString(),
+    });
+    
     if (!url || url.includes('undefined')) {
+      console.error('[API Client] Invalid URL:', url);
       throw new ApiError({
         message: 'API configuration error: Invalid URL',
         status: 0,
@@ -50,7 +58,19 @@ export class ApiClient {
         ...options,
       });
 
+      console.log('[API Client] Response:', {
+        endpoint,
+        status: response.status,
+        ok: response.ok,
+        timestamp: new Date().toISOString(),
+      });
+
       if (!response.ok) {
+        console.error('[API Client] HTTP Error:', {
+          endpoint,
+          status: response.status,
+          statusText: response.statusText,
+        });
         throw new ApiError({
           message: `HTTP error! status: ${response.status}`,
           status: response.status,
@@ -58,6 +78,12 @@ export class ApiClient {
       }
 
       const data = await response.json();
+      console.log('[API Client] Data received:', {
+        endpoint,
+        dataKeys: Object.keys(data),
+        timestamp: new Date().toISOString(),
+      });
+      
       return data;
     } catch (error) {
       if (error instanceof ApiError) {
@@ -65,6 +91,11 @@ export class ApiClient {
       }
       
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      console.error('[API Client] Fetch failed:', {
+        endpoint,
+        error: errorMessage,
+        timestamp: new Date().toISOString(),
+      });
       throw new ApiError({
         message: `fetch failed: ${errorMessage}`,
         status: 0,
@@ -132,6 +163,11 @@ export class ApiClient {
         searchParams.append(key, value);
       });
       finalEndpoint = `${endpoint}?${searchParams.toString()}`;
+      console.log('[API Client] GET with params:', {
+        endpoint,
+        params,
+        finalEndpoint,
+      });
     }
 
     return this.request<T>(finalEndpoint, {
@@ -143,7 +179,7 @@ export class ApiClient {
 
   async post<T>(
     endpoint: string,
-    body?: any,
+    body?: unknown,
     options?: NextFetchOptions
   ): Promise<T> {
     return this.request<T>(endpoint, {
@@ -156,7 +192,7 @@ export class ApiClient {
 
   async postWithHeaders<T>(
     endpoint: string,
-    body?: any,
+    body?: unknown,
     options?: NextFetchOptions
   ): Promise<ApiResponseWithHeaders<T>> {
     return this.requestWithHeaders<T>(endpoint, {

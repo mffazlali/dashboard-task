@@ -27,7 +27,9 @@ export const productService = {
         queryParams.skip = params.skip.toString();
       }
 
-      const response = await apiClient.get<ProductsResponse>('products', queryParams);
+      const response = await apiClient.get<ProductsResponse>('products', queryParams, {
+        cache: 'no-store', // Force fresh data every time
+      });
       return response;
     } catch (error) {
       console.error('Error fetching products:', error);

@@ -27,7 +27,9 @@ export const userService = {
         queryParams.skip = params.skip.toString();
       }
 
-      const response = await apiClient.get<UsersResponse>('users', queryParams);
+      const response = await apiClient.get<UsersResponse>('users', queryParams, {
+        cache: 'no-store', // Force fresh data every time
+      });
       return response;
     } catch (error) {
       console.error('Error fetching users:', error);
