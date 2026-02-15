@@ -24,6 +24,9 @@ features/
 │   ├── components/    # کامپوننت‌های مخصوص فیچر
 │   ├── hooks/         # هوک‌های مخصوص فیچر
 │   └── index.tsx      # نقطه ورود فیچر
+├── games/             # فیچر بازی‌ها (React Query)
+│   ├── general/       # لیست بازی‌ها
+│   └── details/       # جزئیات بازی
 ├── login/             # فیچر ورود
 ├── products/          # فیچر محصولات
 └── users/             # فیچر کاربران
@@ -37,11 +40,19 @@ features/
 shared/
 ├── components/        # کامپوننت‌های قابل استفاده مجدد
 ├── hooks/             # هوک‌های قابل استفاده مجدد React
+│   ├── useAuth.ts    # هوک احراز هویت
+│   └── useGames.ts   # هوک‌های React Query برای بازی‌ها
 ├── layout/            # کامپوننت‌های لی‌اوت (Header، Sidebar)
 ├── lib/               # توابع کمکی و helper ها
+│   ├── apiClient.ts  # کلاینت HTTP عمومی
+│   └── gamesApi.ts   # کلاینت API بازی‌ها (fetch)
 ├── providers/         # پرووایدرهای React context
+│   ├── ChakraProvider.tsx
+│   └── QueryProvider.tsx  # React Query Provider
 ├── services/          # لایه سرویس API
 └── types/             # تعاریف تایپ TypeScript
+    ├── game.ts       # تایپ‌های بازی
+    └── ...
 ```
 
 ## معماری کامپوننت
@@ -69,16 +80,17 @@ async function UsersDataFetcher({ searchParams }: UsersProps) {
 - **تعامل**: تعاملات کاربر، event handler ها
 - **API های مرورگر**: localStorage، window، document
 - **هوک‌های React**: useState، useEffect، useContext
+- **React Query**: برای مدیریت state سرور و caching
 - **کتابخانه‌های شخص ثالث**: که نیاز به اجرای سمت کلاینت دارند
 
-**مثال:**
+**مثال (با React Query)**:
 ```typescript
-// features/users/components/index.tsx (Client Component)
+// features/games/general/index.tsx (Client Component)
 'use client';
 
-export const UsersContent = ({ users }: UsersContentProps) => {
-  const [isPending] = useTransition();
-  // تعامل سمت کلاینت
+export default function GamesFeature() {
+  const { data, isLoading } = useGames(filters);
+  // تعامل سمت کلاینت با React Query
 };
 ```
 
@@ -215,15 +227,39 @@ class ApiClient {
 
 ### State سرور
 
-state سرور از طریق موارد زیر مدیریت می‌شود:
+state سرور از طریق دو رویکرد مدیریت می‌شود:
+
+#### 1. React Server Components (برای Users و Products)
 - **React Server Components**: داده در سرور دریافت می‌شود
 - **کش Next.js**: کش خودکار با revalidation
 - **مرزهای Suspense**: وضعیت‌های بارگذاری
+
+#### 2. React Query (برای Games)
+- **Client-side fetching**: درخواست‌ها از مرورگر
+- **Automatic Caching**: کش خودکار داده‌ها
+- **Smart Refetching**: به‌روزرسانی هوشمند
+- **Loading States**: مدیریت خودکار وضعیت‌ها
+- **Error Handling**: مدیریت ساده خطاها
+
+**مثال React Query:**
+```typescript
+// shared/hooks/useGames.ts
+export function useGames(filters) {
+  return useQuery({
+    queryKey: ['games', filters],
+    queryFn: () => gamesApi.fetchGames(filters),
+  });
+}
+
+// استفاده در کامپوننت
+const { data, isLoading, error } = useGames({ search: 'zelda' });
+```
 
 ### State کلاینت
 
 state کلاینت از طریق موارد زیر مدیریت می‌شود:
 - **هوک‌های React**: useState، useReducer
+- **React Query**: برای state سرور در کلاینت (Games)
 - **Context API**: برای state سراسری کلاینت (احراز هویت)
 - **State URL**: پارامترهای جستجو برای صفحه‌بندی، فیلترها
 - **Local Storage**: برای داده‌های پایدار کلاینت
@@ -232,10 +268,31 @@ state کلاینت از طریق موارد زیر مدیریت می‌شود:
 
 ما عمداً از Redux اجتناب می‌کنیم زیرا:
 - Server Components نیاز به state سراسری را کاهش می‌دهند
+- React Query مدیریت state سرور را ساده می‌کند
 - state URL بیشتر همگام‌سازی داده را مدیریت می‌کند
 - Context API برای state احراز هویت کافی است
 - مدل ذهنی ساده‌تر
 - کد boilerplate کمتر
+
+**مقایسه:**
+```typescript
+// ❌ Redux (پیچیده)
+// - ایجاد slice
+// - ایجاد actions
+// - ایجاد reducers
+// - پیکربندی store
+// - استفاده از useDispatch و useSelector
+// ~150 خط کد
+
+// ✅ React Query (ساده)
+export function useGames(filters) {
+  return useQuery({
+    queryKey: ['games', filters],
+    queryFn: () => gamesApi.fetchGames(filters),
+  });
+}
+// ~30 خط کد
+```
 
 ## معماری مسیریابی
 
@@ -248,8 +305,12 @@ app/
 ├── login/
 │   └── page.tsx           # صفحه ورود (/login)
 └── dashboard/
-    ├── layout.tsx         # لی‌اوت داشبورد
+    ├── layout.tsx         # لی‌اوت داشبورد (با QueryProvider)
     ├── page.tsx           # خانه داشبورد (/dashboard)
+    ├── games/
+    │   ├── page.tsx       # صفحه بازی‌ها (/dashboard/games)
+    │   └── [id]/
+    │       └── page.tsx   # جزئیات بازی (/dashboard/games/[id])
     ├── users/
     │   └── page.tsx       # صفحه کاربران (/dashboard/users)
     └── products/
@@ -284,26 +345,38 @@ app/
 
 ### استراتژی کش
 
-1. **کش سمت سرور**:
-   ```typescript
-   export const revalidate = 30; // Revalidate هر 30 ثانیه
-   ```
+#### 1. کش سمت سرور (Server Components):
+```typescript
+export const revalidate = 30; // Revalidate هر 30 ثانیه
+```
 
-2. **کش پاسخ API**:
-   ```typescript
-   apiClient.get('users', params, {
-     cache: 'no-store' // داده تازه اجباری
-   });
-   ```
+#### 2. کش پاسخ API (Server Components):
+```typescript
+apiClient.get('users', params, {
+  cache: 'no-store' // داده تازه اجباری
+});
+```
 
-3. **بهینه‌سازی تصویر**:
-   ```typescript
-   <Image
-     src={product.thumbnail}
-     fill
-     style={{ objectFit: 'cover' }}
-   />
-   ```
+#### 3. کش React Query (Client Components):
+```typescript
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 60 * 1000,        // 1 دقیقه
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+```
+
+#### 4. بهینه‌سازی تصویر:
+```typescript
+<Image
+  src={product.thumbnail}
+  fill
+  style={{ objectFit: 'cover' }}
+/>
+```
 
 ### بهینه‌سازی بسته
 

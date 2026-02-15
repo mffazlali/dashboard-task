@@ -1,10 +1,10 @@
 # اپلیکیشن داشبورد
 
-یک اپلیکیشن داشبورد مدرن و آماده برای تولید که با Next.js ساخته شده و شامل احراز هویت، مدیریت کاربران و کاتالوگ محصولات است.
+یک اپلیکیشن داشبورد مدرن و آماده برای تولید که با Next.js ساخته شده و شامل احراز هویت، مدیریت کاربران، کاتالوگ محصولات و کتابخانه بازی‌های ویدیویی است.
 
 ## معرفی
 
-این اپلیکیشن داشبورد بهترین شیوه‌های توسعه وب مدرن را نشان می‌دهد، از جمله معماری مبتنی بر فیچر، رندر سمت سرور و یکپارچه‌سازی API با امنیت تایپ. این پروژه با Next.js 15 و React 19 ساخته شده و پایه‌ای محکم برای اپلیکیشن‌های سطح سازمانی فراهم می‌کند.
+این اپلیکیشن داشبورد بهترین شیوه‌های توسعه وب مدرن را نشان می‌دهد، از جمله معماری مبتنی بر فیچر، رندر سمت سرور، React Query برای مدیریت state سرور و یکپارچه‌سازی API با امنیت تایپ. این پروژه با Next.js 15 و React 19 ساخته شده و پایه‌ای محکم برای اپلیکیشن‌های سطح سازمانی فراهم می‌کند.
 
 ## استک فناوری
 
@@ -13,7 +13,8 @@
 - **کتابخانه UI**: Chakra UI v3
 - **استایل‌دهی**: Tailwind CSS 3
 - **مدیریت فرم**: React Hook Form + Zod
-- **API**: DummyJSON (REST API)
+- **مدیریت State سرور**: React Query (TanStack Query)
+- **API**: DummyJSON (REST API) + RAWG API (Games)
 - **مدیریت State**: React Server Components + Client State
 - **احراز هویت**: JWT با کوکی‌های HTTP-only
 
@@ -36,6 +37,11 @@ dashboard-task/
 │   │   ├── components/     # کامپوننت‌های مخصوص داشبورد
 │   │   ├── hooks/          # هوک‌های مخصوص داشبورد
 │   │   └── index.tsx       # کامپوننت اصلی داشبورد
+│   ├── games/              # فیچر بازی‌ها (React Query)
+│   │   ├── general/        # لیست بازی‌ها
+│   │   │   └── index.tsx   # کامپوننت لیست
+│   │   └── details/        # جزئیات بازی
+│   │       └── index.tsx   # کامپوننت جزئیات
 │   ├── login/              # فیچر ورود
 │   │   ├── actions.ts      # اکشن‌های سرور
 │   │   ├── schema.ts       # اسکیماهای اعتبارسنجی
@@ -52,7 +58,8 @@ dashboard-task/
 │   │   ├── AuthGuard.tsx  # محافظت مسیر
 │   │   └── Pagination.tsx # کامپوننت صفحه‌بندی
 │   ├── hooks/              # هوک‌های سفارشی React
-│   │   └── useAuth.ts     # هوک احراز هویت
+│   │   ├── useAuth.ts     # هوک احراز هویت
+│   │   └── useGames.ts    # هوک‌های React Query برای بازی‌ها
 │   ├── layout/             # کامپوننت‌های لی‌اوت
 │   │   ├── Header.tsx     # نوار بالایی
 │   │   └── Sidebar.tsx    # نوار کناری
@@ -60,9 +67,11 @@ dashboard-task/
 │   │   ├── apiClient.ts   # کلاینت HTTP
 │   │   ├── apiConfig.ts   # پیکربندی API
 │   │   ├── cookies.ts     # ابزارهای کوکی
+│   │   ├── gamesApi.ts    # کلاینت API بازی‌ها (fetch)
 │   │   └── store.ts       # ذخیره‌سازی کلاینت
 │   ├── providers/          # پرووایدرهای Context
-│   │   └── ChakraProvider.tsx
+│   │   ├── ChakraProvider.tsx
+│   │   └── QueryProvider.tsx  # React Query Provider
 │   ├── services/           # لایه سرویس API
 │   │   ├── authService.ts
 │   │   ├── productService.ts
@@ -70,6 +79,7 @@ dashboard-task/
 │   └── types/              # تعاریف TypeScript
 │       ├── api.ts
 │       ├── auth.ts
+│       ├── game.ts        # تایپ‌های بازی
 │       ├── product.ts
 │       └── user.ts
 │
@@ -95,6 +105,17 @@ dashboard-task/
 - قابلیت تازه‌سازی دستی
 - دریافت داده سمت سرور
 - به‌روزرسانی‌های Optimistic UI
+
+### مدیریت بازی‌ها (Games)
+- کتابخانه کامل بازی‌های ویدیویی با RAWG API
+- جستجوی بازی با نام
+- فیلترهای پیشرفته (ژانر، پلتفرم، مرتب‌سازی)
+- نمایش جزئیات کامل بازی
+- گالری تصاویر (Screenshots)
+- اطلاعات سازندگان و ناشران
+- امتیازات و Metacritic
+- مدیریت state با React Query
+- Caching خودکار و Refetching هوشمند
 
 ### مدیریت کاربران
 - لیست کاربران با صفحه‌بندی (10 کاربر در هر صفحه)
@@ -325,6 +346,9 @@ const result = await apiClient.post<LoginResponse>('auth/login', {
 - [ ] تازه‌سازی خودکار داشبورد
 - [ ] صفحه‌بندی کاربران
 - [ ] صفحه‌بندی محصولات
+- [ ] صفحه‌بندی بازی‌ها
+- [ ] جستجو و فیلتر بازی‌ها
+- [ ] نمایش جزئیات بازی
 - [ ] طراحی واکنش‌گرا در موبایل
 - [ ] طراحی واکنش‌گرا در تبلت
 - [ ] وضعیت‌های بارگذاری
@@ -437,7 +461,9 @@ CMD ["npm", "start"]
 
 - [Next.js](https://nextjs.org/) - فریمورک React
 - [Chakra UI](https://chakra-ui.com/) - کتابخانه کامپوننت
+- [React Query](https://tanstack.com/query/latest) - مدیریت state سرور
 - [DummyJSON](https://dummyjson.com/) - REST API جعلی
+- [RAWG API](https://rawg.io/apidocs) - API بازی‌های ویدیویی
 - [TypeScript](https://www.typescriptlang.org/) - امنیت تایپ
 
 ## پشتیبانی
