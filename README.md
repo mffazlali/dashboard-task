@@ -11,6 +11,7 @@
 - **فریمورک**: Next.js 15 (App Router)
 - **زبان برنامه‌نویسی**: TypeScript 5
 - **کتابخانه UI**: Chakra UI v3
+- **کامپوننت‌های Headless**: Headless UI (Listbox)
 - **استایل‌دهی**: Tailwind CSS 3
 - **مدیریت فرم**: React Hook Form + Zod
 - **مدیریت State سرور**: React Query (TanStack Query)
@@ -26,8 +27,10 @@ dashboard-task/
 │   ├── dashboard/           # مسیرهای محافظت‌شده داشبورد
 │   │   ├── layout.tsx      # لی‌اوت داشبورد با سایدبار
 │   │   ├── page.tsx        # صفحه اصلی داشبورد با آمار
+│   │   ├── games/          # مدیریت بازی‌ها
 │   │   ├── products/       # مدیریت محصولات
-│   │   └── users/          # مدیریت کاربران
+│   │   ├── users/          # مدیریت کاربران
+│   │   └── select-demo/    # صفحه دمو کامپوننت ورود
 │   ├── login/              # صفحه عمومی ورود
 │   ├── layout.tsx          # لی‌اوت اصلی
 │   └── page.tsx            # صفحه لندینگ
@@ -55,6 +58,11 @@ dashboard-task/
 │
 ├── shared/                  # منابع مشترک
 │   ├── components/         # کامپوننت‌های قابل استفاده مجدد
+│   │   ├── AdvancedSelect/ # کامپوننت Select پیشرفته
+│   │   │   ├── AdvancedSelect.tsx  # کامپوننت اصلی
+│   │   │   ├── types.ts            # تایپ‌های TypeScript
+│   │   │   ├── index.tsx           # Export اصلی
+│   │   │   └── README.md           # مستندات کامپوننت
 │   │   ├── AuthGuard.tsx  # محافظت مسیر
 │   │   └── Pagination.tsx # کامپوننت صفحه‌بندی
 │   ├── hooks/              # هوک‌های سفارشی React
@@ -132,6 +140,28 @@ dashboard-task/
 - اطلاعات موجودی
 - نشانگرهای تخفیف
 
+### کامپوننت Select پیشرفته (AdvancedSelect)
+- استفاده از Headless UI (Listbox) برای Accessibility کامل
+- استایل‌دهی با Tailwind CSS
+- جستجوی زنده در آیتم‌ها
+- انتخاب چندتایی (Multi-select) با نمایش تعداد
+- گروه‌بندی آیتم‌ها به صورت خودکار
+- دکمه‌های انتخاب همه/حذف همه
+- پشتیبانی از RTL (راست به چپ)
+- غیرفعال کردن آیتم‌های خاص
+- مجازی‌سازی برای لیست‌های بزرگ (بهینه‌سازی عملکرد)
+- صفحه دمو جامع در `/dashboard/select-demo`
+
+### کامپوننت‌های قابل استفاده مجدد
+- **AuthGuard**: محافظت از مسیرها و بررسی احراز هویت
+- **Pagination**: صفحه‌بندی با پشتیبانی کامل
+- **AdvancedSelect**: کامپوننت Select پیشرفته با قابلیت‌های کامل
+  - انتخاب تکی و چندتایی
+  - جستجو و فیلتر
+  - گروه‌بندی خودکار
+  - مجازی‌سازی برای عملکرد بهتر
+  - Accessible (ARIA compliant)
+
 ### ویژگی‌های UI/UX
 - طراحی واکنش‌گرا (موبایل، تبلت، دسکتاپ)
 - اسکلتون‌های بارگذاری برای تجربه کاربری بهتر
@@ -151,7 +181,7 @@ dashboard-task/
 
 1. کلون کردن مخزن:
 ```bash
-git clone <repository-url>
+git clone https://github.com/mffazlali/dashboard-task.git
 cd dashboard-task
 ```
 
@@ -228,6 +258,114 @@ npm run lint
 2. کامپوننت‌های فیچر را در `components/` اضافه کنید
 3. سرویس API را در `shared/services/` ایجاد کنید
 4. تایپ‌ها را در `shared/types/` تعریف کنید
+5. مسیر را در `app/dashboard/` اضافه کنید
+
+### استفاده از کامپوننت AdvancedSelect
+
+کامپوننت Select پیشرفته برای انتخاب‌های تکی و چندتایی:
+
+```typescript
+import { AdvancedSelect } from '@/shared/components';
+import { useState } from 'react';
+
+// انتخاب تکی
+function SingleSelectExample() {
+  const [value, setValue] = useState<string | number>('');
+  
+  const options = [
+    { value: 1, label: 'گزینه اول' },
+    { value: 2, label: 'گزینه دوم' },
+    { value: 3, label: 'گزینه سوم' },
+  ];
+
+  return (
+    <AdvancedSelect
+      options={options}
+      value={value}
+      onChange={setValue}
+      placeholder="یک گزینه انتخاب کنید"
+      searchable
+    />
+  );
+}
+
+// انتخاب چندتایی با گروه‌بندی
+function MultiSelectExample() {
+  const [values, setValues] = useState<(string | number)[]>([]);
+  
+  const options = [
+    { value: 1, label: 'سیب', group: 'میوه‌های داخلی' },
+    { value: 2, label: 'پرتقال', group: 'میوه‌های داخلی' },
+    { value: 3, label: 'موز', group: 'میوه‌های وارداتی' },
+    { value: 4, label: 'انبه', group: 'میوه‌های وارداتی' },
+  ];
+
+  return (
+    <AdvancedSelect
+      options={options}
+      value={values}
+      onChange={setValues}
+      multiple
+      searchable
+      showSelectAll
+      placeholder="میوه‌ها را انتخاب کنید"
+    />
+  );
+}
+
+// انتخاب با مجازی‌سازی (برای لیست‌های بزرگ)
+function VirtualizedSelectExample() {
+  const [values, setValues] = useState<(string | number)[]>([]);
+  
+  // تولید 1000 آیتم
+  const largeOptions = Array.from({ length: 1000 }, (_, i) => ({
+    value: i + 1,
+    label: `آیتم شماره ${i + 1}`,
+    group: i % 3 === 0 ? 'گروه A' : i % 3 === 1 ? 'گروه B' : 'گروه C',
+  }));
+
+  return (
+    <AdvancedSelect
+      options={largeOptions}
+      value={values}
+      onChange={setValues}
+      multiple
+      searchable
+      showSelectAll
+      virtualized
+      placeholder="از 1000 آیتم انتخاب کنید"
+    />
+  );
+}
+```
+
+#### Props کامپوننت AdvancedSelect
+
+| Prop | Type | Default | توضیحات |
+|------|------|---------|---------|
+| `options` | `SelectOption[]` | required | آرایه گزینه‌ها |
+| `value` | `string \| number \| (string \| number)[]` | - | مقدار انتخاب شده |
+| `onChange` | `(value) => void` | required | تابع تغییر مقدار |
+| `multiple` | `boolean` | `false` | فعال‌سازی انتخاب چندتایی |
+| `searchable` | `boolean` | `true` | نمایش جستجو |
+| `placeholder` | `string` | `'انتخاب کنید...'` | متن placeholder |
+| `disabled` | `boolean` | `false` | غیرفعال کردن کامپوننت |
+| `virtualized` | `boolean` | `false` | مجازی‌سازی برای لیست‌های بزرگ |
+| `showSelectAll` | `boolean` | `false` | نمایش دکمه انتخاب همه |
+| `className` | `string` | - | کلاس CSS اضافی |
+
+#### تایپ SelectOption
+
+```typescript
+interface SelectOption {
+  value: string | number;
+  label: string;
+  disabled?: boolean;  // غیرفعال کردن این گزینه
+  group?: string;      // نام گروه برای گروه‌بندی
+}
+```
+
+برای مشاهده مثال‌های کامل و تعاملی، به صفحه `/dashboard/select-demo` مراجعه کنید.
 5. مسیر را در `app/dashboard/` اضافه کنید
 
 مثال ساختار:
@@ -349,6 +487,12 @@ const result = await apiClient.post<LoginResponse>('auth/login', {
 - [ ] صفحه‌بندی بازی‌ها
 - [ ] جستجو و فیلتر بازی‌ها
 - [ ] نمایش جزئیات بازی
+- [ ] کامپوننت AdvancedSelect - انتخاب تکی
+- [ ] کامپوننت AdvancedSelect - انتخاب چندتایی
+- [ ] کامپوننت AdvancedSelect - جستجو در آیتم‌ها
+- [ ] کامپوننت AdvancedSelect - گروه‌بندی
+- [ ] کامپوننت AdvancedSelect - انتخاب همه/حذف همه
+- [ ] کامپوننت AdvancedSelect - مجازی‌سازی (1000 آیتم)
 - [ ] طراحی واکنش‌گرا در موبایل
 - [ ] طراحی واکنش‌گرا در تبلت
 - [ ] وضعیت‌های بارگذاری
@@ -428,48 +572,3 @@ CMD ["npm", "start"]
 - node_modules را پاک کنید: `rm -rf node_modules`
 - دوباره نصب کنید: `npm install`
 - دوباره بیلد کنید: `npm run build`
-
-**مشکل**: خطاهای TypeScript
-- `npm run lint` را اجرا کنید
-- پیکربندی `tsconfig.json` را بررسی کنید
-- تأیید کنید که همه تایپ‌ها به درستی import شده‌اند
-
-## مشارکت
-
-1. مخزن را Fork کنید
-2. یک برنچ فیچر ایجاد کنید (`git checkout -b feature/amazing-feature`)
-3. تغییرات خود را کامیت کنید (`git commit -m 'Add amazing feature'`)
-4. به برنچ پوش کنید (`git push origin feature/amazing-feature`)
-5. یک Pull Request باز کنید
-
-### قرارداد Commit
-
-از conventional commits پیروی کنید:
-- `feat:` فیچر جدید
-- `fix:` رفع باگ
-- `docs:` تغییرات مستندات
-- `style:` تغییرات سبک کد
-- `refactor:` بازنویسی کد
-- `test:` اضافه/تغییر تست‌ها
-- `chore:` تغییرات فرآیند بیلد یا ابزارهای کمکی
-
-## مجوز
-
-این پروژه تحت مجوز MIT منتشر شده است.
-
-## قدردانی
-
-- [Next.js](https://nextjs.org/) - فریمورک React
-- [Chakra UI](https://chakra-ui.com/) - کتابخانه کامپوننت
-- [React Query](https://tanstack.com/query/latest) - مدیریت state سرور
-- [DummyJSON](https://dummyjson.com/) - REST API جعلی
-- [RAWG API](https://rawg.io/apidocs) - API بازی‌های ویدیویی
-- [TypeScript](https://www.typescriptlang.org/) - امنیت تایپ
-
-## پشتیبانی
-
-برای پشتیبانی، لطفاً یک issue در مخزن GitHub باز کنید یا با تیم توسعه تماس بگیرید.
-
----
-
-ساخته شده با ❤️ با استفاده از Next.js و TypeScript

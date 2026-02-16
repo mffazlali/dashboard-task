@@ -9,6 +9,7 @@ const menuItems = [
   { href: '/dashboard/users', label: 'Users', icon: '👥' },
   { href: '/dashboard/products', label: 'Products', icon: '📦' },
   { href: '/dashboard/games', label: 'Games', icon: '🎮' },
+  { href: '/dashboard/select-demo', label: 'Select Demo', icon: '🎯' },
 ];
 
 export const Sidebar = () => {
